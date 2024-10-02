@@ -7,14 +7,14 @@ from firebase_admin import credentials, initialize_app, db as admin_db  # Rename
 app = Flask(__name__)
 
 # Load Firebase configuration from the JSON file
-firebase_config_path = os.path.join(os.path.dirname(__file__), 'Data/google-services.json')
+firebase_config_path = os.path.join(os.path.dirname(__file__), 'data/google-services.json')
 
 # Load Firebase credentials
 with open(firebase_config_path) as f:
     config = json.load(f)
 
 # Initialize Firebase Admin
-cred = credentials.Certificate("Data/be-safe-app-c1e4e-firebase-adminsdk-1cw7e-2d372acfa8.json")
+cred = credentials.Certificate("data/be-safe-app-c1e4e-firebase-adminsdk-1cw7e-2d372acfa8.json")
 initialize_app(cred, {
     'databaseURL': 'https://be-safe-app-c1e4e.firebaseio.com/'
 })
