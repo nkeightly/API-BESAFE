@@ -144,25 +144,28 @@ def save_language_preference():
         if token and token.startswith('Bearer '):
             token = token[len('Bearer '):]
 
-        # Verify Firebase token to get the user ID
-        decoded_token = auth.verify_id_token(token)
-        user_id = decoded_token['uid']
+            # Verify Firebase token to get the user ID
+            decoded_token = auth.verify_id_token(token)
+            user_id = decoded_token['uid']
 
-        # Get language preference from the request body
-        data = request.json
-        language_preference = data.get('languagePreference')
+            # Get language preference from the request body
+            data = request.json
+            language_preference = data.get('languagePreference')
 
-        if not language_preference:
-            return jsonify({"error": "Language preference is required"}), 400
+            if not language_preference:
+                return jsonify({"error": "Language preference is required"}), 400
 
-        # Save the language preference in Firebase
-        user_ref = admin_db.reference(f'users/{user_id}')
-        user_ref.update({"languagePreference": language_preference})
+            # Save the language preference in Firebase
+            user_ref = admin_db.reference(f'users/{user_id}')
+            user_ref.update({"languagePreference": language_preference})
 
-        return jsonify({"message": "Language preference saved successfully!"}), 200
+            return jsonify({"message": "Language preference saved successfully!"}), 200
+
+        else:
+            return jsonify({"error": "Authorization token missing"}), 401
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/get-language-preference', methods=['GET'])
 def get_language_preference():
@@ -172,21 +175,24 @@ def get_language_preference():
         if token and token.startswith('Bearer '):
             token = token[len('Bearer '):]
 
-        # Verify Firebase token to get the user ID
-        decoded_token = auth.verify_id_token(token)
-        user_id = decoded_token['uid']
+            # Verify Firebase token to get the user ID
+            decoded_token = auth.verify_id_token(token)
+            user_id = decoded_token['uid']
 
-        # Fetch the language preference from Firebase
-        user_ref = admin_db.reference(f'users/{user_id}/languagePreference')
-        language_preference = user_ref.get()
+            # Fetch the language preference from Firebase
+            user_ref = admin_db.reference(f'users/{user_id}/languagePreference')
+            language_preference = user_ref.get()
 
-        if language_preference:
-            return jsonify({"languagePreference": language_preference}), 200
+            if language_preference:
+                return jsonify({"languagePreference": language_preference}), 200
+            else:
+                return jsonify({"message": "No language preference found"}), 404
+
         else:
-            return jsonify({"message": "No language preference found"}), 404
+            return jsonify({"error": "Authorization token missing"}), 401
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
