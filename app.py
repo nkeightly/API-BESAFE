@@ -71,23 +71,18 @@ def register():
 @app.route('/api/emergency-contacts', methods=['GET'])
 def fetch_emergency_contacts():
     token = request.headers.get('Authorization')
-
-    if token:
-        token = token.encode('utf-8').decode('utf-8')  # Encoding and decoding might not be necessary here
-        print(f"Token: {token}")
-    else:
-        print("No token found")
+    
+    if not token:
         return jsonify({"error": "Authorization token missing"}), 401
 
     try:
-        # Remove 'Bearer ' from the token if present
+        # Clean the token
         if token.startswith('Bearer '):
             token = token[len('Bearer '):]
 
-        # Verify token using Firebase Admin SDK
+        # Verify token
         decoded_token = auth.verify_id_token(token)
         user_id = decoded_token['uid']
-
 
         # Fetch emergency contacts for the user
         user_contacts_ref = admin_db.reference(f'users/{user_id}/emergencyContacts')
